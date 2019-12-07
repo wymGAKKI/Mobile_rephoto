@@ -8,12 +8,21 @@ import android.view.SurfaceHolder;
 
 import org.opencv.core.Size;
 
+import java.io.IOException;
 import java.util.List;
 
 public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
 
     private Camera mCamera;
     private SurfaceHolder mHolder;
+
+    /** Do in each frame */
+    private Camera.PreviewCallback mCameraPreviewCallback = new Camera.PreviewCallback() {
+        @Override
+        public void onPreviewFrame(byte[] bytes, Camera camera) {
+
+        }
+    };
 
     /** camera view size */
     private Size previewSize;
@@ -92,9 +101,30 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         mCamera.setParameters(parameters);
     }
 
+
+    /** start camera preview */
+    private void startCameraPreview() {
+        if (mCamera == null) {
+            return ;
+        }
+
+        try {
+            //*EDIT*//params.setFocusMode("continuous-picture");
+            //It is better to use defined constraints as opposed to String, thanks to AbdelHady
+            //Camera.Parameters params = mCamera.getParameters();
+            //params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+            //mCamera.setParameters(params);
+            mCamera.setPreviewDisplay(mHolder);
+            mCamera.setPreviewCallback(mCameraPreviewCallback);
+            mCamera.startPreview();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-
+        Log.i("CameraView", "Created");
+        startCameraPreview();
     }
 
     @Override
