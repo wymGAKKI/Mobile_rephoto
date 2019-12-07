@@ -34,8 +34,6 @@ public class MainActivity extends AppCompatActivity {
     private static double scaleTakeImage = 1;
     private Size previewSize;
     /** Camera show*/
-    private Camera mCamera;
-    private SurfaceHolder mHolder;
     private CameraView cameraView;
 
     /** view */
