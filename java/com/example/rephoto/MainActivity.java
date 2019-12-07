@@ -11,6 +11,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -34,13 +35,18 @@ public class MainActivity extends AppCompatActivity {
     private static double scaleTakeImage = 1;
     private Size previewSize;
     /** Camera show*/
-    private Camera mCamera;
     private SurfaceHolder mHolder;
     private CameraView cameraView;
 
     /** view */
     private FrameLayout preview;
     private DrawView drawView;
+
+    private Button takePhotoButton;
+    private Button openButton;
+    private Button okButton;
+    private Button clearButton;
+    private Button changeButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,8 +73,11 @@ public class MainActivity extends AppCompatActivity {
         drawView.setZOrderMediaOverlay(true);
 
         /** camera*/
-        cameraView = new CameraView(this);
+        cameraView = new CameraView(this, drawView);
         preview.addView(cameraView);
+
+        /** Button */
+
     }
 
     /**

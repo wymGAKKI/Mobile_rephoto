@@ -15,6 +15,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
 
     private Camera mCamera;
     private SurfaceHolder mHolder;
+    private DrawView mDraw;
 
     /** Do in each frame */
     private Camera.PreviewCallback mCameraPreviewCallback = new Camera.PreviewCallback() {
@@ -30,11 +31,12 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     /** nothing, only keep from last version */
     private static double scaleTakeImage = 1;
 
-    public CameraView(Context context) {
+    public CameraView(Context context, DrawView drawView) {
         super(context);
         initCamera();
         mHolder = this.getHolder();
         mHolder.addCallback(this);
+        mDraw = drawView;
     }
 
     /** return a camera instance */
