@@ -1,6 +1,7 @@
 package com.example.rephoto;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.SurfaceView;
@@ -25,6 +26,14 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         }
     };
 
+    private Camera.PictureCallback mCameraPictureCallback = new Camera.PictureCallback() {
+        @Override
+        public void onPictureTaken(byte[] bytes, Camera camera) {
+
+        }
+    };
+
+
     /** camera view size */
     private Size previewSize;
 
@@ -37,6 +46,10 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         mHolder = this.getHolder();
         mHolder.addCallback(this);
         mDraw = drawView;
+    }
+
+    public void takePicture() {
+        mCamera.takePicture(null, null, mCameraPictureCallback);
     }
 
     /** return a camera instance */
