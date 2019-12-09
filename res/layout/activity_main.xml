@@ -17,7 +17,7 @@
         ></FrameLayout>
 
     <com.example.rephoto.SaveButtonView
-        android:id="@+id/testButton"
+        android:id="@+id/okButton"
         android:layout_width="50dip"
         android:layout_height="50dip"
         app:layout_constraintBottom_toBottomOf="parent"

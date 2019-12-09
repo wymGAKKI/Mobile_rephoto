@@ -3,10 +3,15 @@ package com.example.rephoto;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Surface;
@@ -15,12 +20,14 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Size;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
@@ -41,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         HAVE_REF,
         REPHOTO,
         REPHOTO_DONE,
+        SWITCH,
         FINISH
     }
 
@@ -64,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
 
     /** */
     private Bitmap tempBitmap;
+
+    GetPathFromUri4kitkat getPathFromUri4kitkat = new GetPathFromUri4kitkat();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +112,22 @@ public class MainActivity extends AppCompatActivity {
                 takePhotoClickAction();
             }
         });
+
+        openButton = (Button) findViewById(R.id.openButton);
+        openButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                takeOpenClickAction();
+            }
+        });
+
+        okButton = (Button) findViewById(R.id.okButton);
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                takeOkClickAction();
+            }
+        });
     }
 
     private void gotoSHOW_REF() {
@@ -136,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
         takePhotoButton.setBackgroundResource(R.drawable.snap_button);
     }
 
+
     private void takePhotoClickAction() {
         final Bitmap bitmap = tempBitmap;
         if (bitmap != null) {
@@ -151,8 +178,48 @@ public class MainActivity extends AppCompatActivity {
                 case REPHOTO:
                     cameraView.takePicture();
                     gotoREPHOTO_DONE();
+                    /**choose image*/
             }
         }
+    }
+
+    private void takeOpenClickAction() {
+        switch (state) {
+            case NO_REF:
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                startActivityForResult(intent, 100);
+        }
+    }
+
+    private void takeOkClickAction() {
+        switch (state) {
+            case SHOW_REF:
+
+                break;
+            case REPHOTO_DONE:
+                break;
+            case SWITCH:
+                break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK && requestCode == 100) {
+            Uri selectedImage = data.getData();
+            if (selectedImage != null) {
+                String imagePath = getPathFromUri4kitkat.getPath(MainActivity.this, selectedImage);
+                String imageName = imagePath.substring(imagePath.lastIndexOf("/") + 1, imagePath.lastIndexOf("-"));
+                try {
+                    Bitmap bitmap = BitmapFactory.decodeStream(this.getContentResolver().openInputStream(selectedImage));
+                    bitmap = MyUtility.scaleBitmap(bitmap, (float) (1920.0f / bitmap.getWidth()), (float) (1080.0f / bitmap.getHeight()));
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     /**
