@@ -98,6 +98,13 @@ public class MainActivity extends AppCompatActivity {
         preview.addView(cameraView);
 
         /** Button */
+        initButton();
+
+        gotoNO_REF();
+
+    }
+
+    private void initButton() {
         takePhotoButton = (Button)findViewById(R.id.take_picture);
         takePhotoButton.setOnClickListener(new View.OnClickListener() {
 
@@ -124,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         clearButton = (Button) findViewById(R.id.closeButton);
-        clearButton.setVisibility(View.GONE);
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -182,11 +188,31 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 builder.show();
-
+                gotoHAVE_REF();
                 break;
+
             case REPHOTO_DONE:
                 break;
             case SWITCH:
+                break;
+        }
+    }
+
+    private void takeClearClickAction() {
+        switch (MyUtility.state) {
+            case NO_REF:
+                break;
+            case SHOW_REF:
+                gotoNO_REF();
+                break;
+            case HAVE_REF:
+                gotoNO_REF();
+                break;
+            case REPHOTO_DONE:
+                gotoHAVE_REF();
+                break;
+            case FINISH:
+                gotoHAVE_REF();
                 break;
         }
     }
@@ -207,6 +233,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void gotoNO_REF() {
+        MyUtility.state = NO_REF;
+        okButton.setVisibility(View.GONE);
+        openButton.setVisibility(View.VISIBLE);
+        clearButton.setVisibility(View.GONE);
+        takePhotoButton.setVisibility(View.VISIBLE);
     }
 
     private void gotoSHOW_REF() {
