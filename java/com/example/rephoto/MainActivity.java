@@ -162,6 +162,26 @@ public class MainActivity extends AppCompatActivity {
     private void takeOkClickAction() {
         switch (MyUtility.state) {
             case SHOW_REF:
+                final EditText inputServer = new EditText(MainActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Input Image Name:").setView(inputServer).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String nowName = inputServer.getText().toString();
+                        if (nowName == "") {
+                            nowName = System.currentTimeMillis() + "";
+                        }
+                        cameraView.saveRefImage(nowName);
+                    }
+                });
+                builder.show();
 
                 break;
             case REPHOTO_DONE:

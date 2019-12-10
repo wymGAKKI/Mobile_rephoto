@@ -1,6 +1,8 @@
 package com.example.rephoto;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
@@ -10,6 +12,8 @@ import android.hardware.Camera;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
+import android.view.View;
+import android.widget.EditText;
 
 import org.opencv.core.Size;
 
@@ -229,5 +233,9 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
 
+    }
+
+    public void saveRefImage(String imageName) {
+        MyUtility.saveImageToGallery(getContext().getApplicationContext(), takeRefImage, "rephoto", imageName + "-ref.png");
     }
 }
