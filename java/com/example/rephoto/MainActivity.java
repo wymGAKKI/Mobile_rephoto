@@ -31,6 +31,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
+import static com.example.rephoto.State.HAVE_REF;
+import static com.example.rephoto.State.NO_REF;
+import static com.example.rephoto.State.REPHOTO;
+import static com.example.rephoto.State.REPHOTO_DONE;
+import static com.example.rephoto.State.SHOW_REF;
+
 public class MainActivity extends AppCompatActivity {
 
     // Used to load the 'native-lib' library on application startup.
@@ -41,18 +47,6 @@ public class MainActivity extends AppCompatActivity {
         System.loadLibrary("opencv_java3");
         System.loadLibrary("native-lib");
     }
-
-    public enum State {
-        NO_REF,
-        SHOW_REF,
-        HAVE_REF,
-        REPHOTO,
-        REPHOTO_DONE,
-        SWITCH,
-        FINISH
-    }
-
-    State state;
 
     private static double scaleTakeImage = 1;
     private Size previewSize;
@@ -131,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void gotoSHOW_REF() {
-        state = State.SHOW_REF;
+        MyUtility.state = SHOW_REF;
         okButton.setVisibility(View.VISIBLE);
         openButton.setVisibility(View.GONE);
         clearButton.setVisibility(View.VISIBLE);
@@ -139,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void gotoHAVE_REF() {
-        state = State.HAVE_REF;
+        MyUtility.state = HAVE_REF;
         okButton.setVisibility(View.GONE);
         openButton.setVisibility(View.GONE);
         clearButton.setVisibility(View.VISIBLE);
@@ -147,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void gotoREPHOTO() {
-        state = State.REPHOTO;
+        MyUtility.state = REPHOTO;
         okButton.setVisibility(View.GONE);
         openButton.setVisibility(View.GONE);
         clearButton.setVisibility(View.VISIBLE);
@@ -155,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void gotoREPHOTO_DONE() {
-        state = State.REPHOTO_DONE;
+        MyUtility.state = REPHOTO_DONE;
         okButton.setVisibility(View.VISIBLE);
         clearButton.setVisibility(View.VISIBLE);
         takePhotoButton.setVisibility(View.INVISIBLE);
@@ -167,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
         final Bitmap bitmap = tempBitmap;
         if (bitmap != null) {
             Log.i("Take picture", bitmap.getWidth() + "," + bitmap.getHeight());
-            switch (state) {
+            switch (MyUtility.state) {
                 case NO_REF:
                     cameraView.takePicture();
                     gotoSHOW_REF();
@@ -184,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void takeOpenClickAction() {
-        switch (state) {
+        switch (MyUtility.state) {
             case NO_REF:
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
@@ -193,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void takeOkClickAction() {
-        switch (state) {
+        switch (MyUtility.state) {
             case SHOW_REF:
 
                 break;

@@ -21,7 +21,18 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.Exchanger;
 
+enum State {
+    NO_REF,
+    SHOW_REF,
+    HAVE_REF,
+    REPHOTO,
+    REPHOTO_DONE,
+    SWITCH,
+    FINISH
+}
+
 public class MyUtility {
+    public static State state = State.NO_REF;
 
     public static double THRES = 5;
     public static double INF = 1e9;
