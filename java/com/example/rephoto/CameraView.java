@@ -15,12 +15,19 @@ import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.EditText;
 
+import org.opencv.android.Utils;
+import org.opencv.core.Mat;
 import org.opencv.core.Size;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+
+import static com.example.rephoto.State.NO_REF;
+import static com.example.rephoto.State.REPHOTO_DONE;
+import static com.example.rephoto.State.SHOW_REF;
+
 
 public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -45,11 +52,14 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     private Camera.PreviewCallback mCameraPreviewCallback = new Camera.PreviewCallback() {
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
+            Log.i("test draw", "test draw");
+
             switch (MyUtility.state) {
                 case NO_REF:
                     mDraw.getCanvas();
                     mDraw.clearDraw();
                     mDraw.update();
+
                     break;
                 case SHOW_REF:
                     mDraw.getCanvas();
@@ -76,7 +86,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
                                     100, stream);
 
                             Bitmap nowImage = MyUtility.rotateBitmap(BitmapFactory.decodeByteArray(
-                                    stream.toByteArray(), 0, stream.size()), 0);
+                                    stream.toByteArray(), 0, stream.size()), 90);
 
                             stream.close();
 
@@ -86,7 +96,13 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
+                    Mat t1 = new Mat();
+                    Mat t2 = new Mat();
+                    Mat t3 = new Mat();
+                    Utils.bitmapToMat(refImage, t1);
+                    Utils.bitmapToMat(rephotoImage, t2);
+                    alphaBlend(t1.getNativeObjAddr(), t2.getNativeObjAddr(), t3.getNativeObjAddr());
+                    alphaBlend = Bitmap.createBitmap(t3.width(), t3.height(), Bitmap.Config.ARGB_8888);
                     mDraw.getCanvas();
                     mDraw.clearDraw();
                     mDraw.drawBitmap(alphaBlend);
@@ -100,15 +116,22 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     private Camera.PictureCallback mCameraPictureCallback = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
+            Log.i("Take", MyUtility.state+ "");
             switch (MyUtility.state) {
                 case NO_REF:
-                    takeRefImage = MyUtility.rotateBitmap(BitmapFactory.decodeByteArray(data, 0, data.length), 0);
+                    takeRefImage = MyUtility.rotateBitmap(BitmapFactory.decodeByteArray(data, 0, data.length), 90);
                     refImage = MyUtility.scaleBitmap(takeRefImage, scaleShowImage, scaleShowImage);
+                    MyUtility.state = SHOW_REF;
                     startCameraPreview();
+
+                    Log.i("take", "photo");
+
+
                     break;
                 case REPHOTO:
-                    takeResultImage = MyUtility.rotateBitmap(BitmapFactory.decodeByteArray(data, 0, data.length), 0);
+                    takeResultImage = MyUtility.rotateBitmap(BitmapFactory.decodeByteArray(data, 0, data.length), 90);
                     startCameraPreview();
+                    MyUtility.state = REPHOTO_DONE;
                     resultImage = MyUtility.scaleBitmap(takeRefImage, scaleShowImage, scaleShowImage);
                     break;
             }
@@ -132,7 +155,10 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void takePicture() {
+        Log.i("take", "picture");
+
         mCamera.takePicture(null, null, mCameraPictureCallback);
+
     }
 
     /** return a camera instance */
@@ -202,9 +228,12 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
 
     /** start camera preview */
     private void startCameraPreview() {
+
         if (mCamera == null) {
             return ;
         }
+        Log.i("start", "start view1");
+
 
         try {
             //*EDIT*//params.setFocusMode("continuous-picture");
@@ -214,6 +243,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
             //mCamera.setParameters(params);
             mCamera.setPreviewDisplay(mHolder);
             mCamera.setPreviewCallback(mCameraPreviewCallback);
+            Log.i("start", "start view");
             mCamera.startPreview();
         } catch (IOException e) {
             e.printStackTrace();
@@ -238,4 +268,6 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     public void saveRefImage(String imageName) {
         MyUtility.saveImageToGallery(getContext().getApplicationContext(), takeRefImage, "rephoto", imageName + "-ref.png");
     }
+
+    public native void alphaBlend(long src1, long src2, long result);
 }

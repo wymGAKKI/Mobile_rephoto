@@ -31,6 +31,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
+import static com.example.rephoto.State.FINISH;
 import static com.example.rephoto.State.HAVE_REF;
 import static com.example.rephoto.State.NO_REF;
 import static com.example.rephoto.State.REPHOTO;
@@ -134,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                takeClearClickAction();
             }
         });
     }
@@ -147,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
                 gotoSHOW_REF();
                 break;
             case HAVE_REF:
+                MyUtility.state = REPHOTO;
                 gotoREPHOTO();
                 break;
             case REPHOTO:
@@ -184,11 +186,14 @@ public class MainActivity extends AppCompatActivity {
                         if (nowName == "") {
                             nowName = System.currentTimeMillis() + "";
                         }
-                        cameraView.saveRefImage(nowName);
+                        MyUtility.state = HAVE_REF;
+                        gotoHAVE_REF();
+                        //cameraView.saveRefImage(nowName);
                     }
                 });
                 builder.show();
-                gotoHAVE_REF();
+                Log.i("goto haveref", "haveref");
+
                 break;
 
             case REPHOTO_DONE:
@@ -203,15 +208,19 @@ public class MainActivity extends AppCompatActivity {
             case NO_REF:
                 break;
             case SHOW_REF:
+                MyUtility.state = NO_REF;
                 gotoNO_REF();
                 break;
             case HAVE_REF:
+                MyUtility.state = NO_REF;
                 gotoNO_REF();
                 break;
             case REPHOTO_DONE:
+                MyUtility.state = HAVE_REF;
                 gotoHAVE_REF();
                 break;
             case FINISH:
+                MyUtility.state = FINISH;
                 gotoHAVE_REF();
                 break;
         }
@@ -236,40 +245,45 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void gotoNO_REF() {
-        MyUtility.state = NO_REF;
         okButton.setVisibility(View.GONE);
         openButton.setVisibility(View.VISIBLE);
         clearButton.setVisibility(View.GONE);
         takePhotoButton.setVisibility(View.VISIBLE);
+        takePhotoButton.setBackgroundResource(R.drawable.snap_button);
+
     }
 
     private void gotoSHOW_REF() {
-        MyUtility.state = SHOW_REF;
         okButton.setVisibility(View.VISIBLE);
         openButton.setVisibility(View.GONE);
         clearButton.setVisibility(View.VISIBLE);
         takePhotoButton.setVisibility(View.INVISIBLE);
+        takePhotoButton.setBackgroundResource(R.drawable.snap_button);
+
     }
 
     private void gotoHAVE_REF() {
-        MyUtility.state = HAVE_REF;
         okButton.setVisibility(View.GONE);
         openButton.setVisibility(View.GONE);
         clearButton.setVisibility(View.VISIBLE);
         takePhotoButton.setVisibility(View.VISIBLE);
+        takePhotoButton.setBackgroundResource(R.drawable.snap_button);
+
     }
 
     private void gotoREPHOTO() {
-        MyUtility.state = REPHOTO;
         okButton.setVisibility(View.GONE);
         openButton.setVisibility(View.GONE);
         clearButton.setVisibility(View.VISIBLE);
+        takePhotoButton.setVisibility(View.VISIBLE);
+
         takePhotoButton.setBackgroundResource(R.drawable.snap_button_stop);
     }
 
     private void gotoREPHOTO_DONE() {
-        MyUtility.state = REPHOTO_DONE;
         okButton.setVisibility(View.VISIBLE);
+        openButton.setVisibility(View.GONE);
+
         clearButton.setVisibility(View.VISIBLE);
         takePhotoButton.setVisibility(View.INVISIBLE);
         takePhotoButton.setBackgroundResource(R.drawable.snap_button);
