@@ -26,7 +26,7 @@ Java_com_example_wu6shen_rephoto_MainActivity_alphaBlend(JNIEnv *env, jobject in
 }
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_rephoto_CameraView_alphaBlend(JNIEnv *env, jobject thiz, jlong src1, jlong src2,
+Java_com_example_rephoto_CameraView_calAlphaBlend(JNIEnv *env, jobject thiz, jlong src1, jlong src2,
                                                jlong result) {
     // TODO: implement alphaBlend()
     cv::Mat *ptr1 = (cv::Mat *)src1;

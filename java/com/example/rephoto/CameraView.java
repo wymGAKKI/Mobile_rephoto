@@ -35,8 +35,8 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;
     private DrawView mDraw;
 
-    private float scaleShowImage = 0.5f;
-    private float scaleCalImage = 0.5f;
+    private float scaleShowImage = 1.0f;
+    private float scaleCalImage = 1.0f;
 
     private Bitmap takeRefImage;
     private Bitmap refImage;
@@ -101,10 +101,12 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
                     Mat t3 = new Mat();
                     Utils.bitmapToMat(refImage, t1);
                     Utils.bitmapToMat(rephotoImage, t2);
-                    alphaBlend(t1.getNativeObjAddr(), t2.getNativeObjAddr(), t3.getNativeObjAddr());
+                    calAlphaBlend(t1.getNativeObjAddr(), t2.getNativeObjAddr(), t3.getNativeObjAddr());
                     alphaBlend = Bitmap.createBitmap(t3.width(), t3.height(), Bitmap.Config.ARGB_8888);
+                    Utils.matToBitmap(t3, alphaBlend);
                     mDraw.getCanvas();
                     mDraw.clearDraw();
+                    Log.i("test", "alphablend");
                     mDraw.drawBitmap(alphaBlend);
                     mDraw.update();
                     break;
@@ -212,7 +214,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         printSupportedSize();
         parameters.setPictureSize((int)(bestPictureSize.width*scaleTakeImage), (int)(bestPictureSize.height*scaleTakeImage));
         parameters.setZoom(1);
-        parameters.setPictureSize(3840, 2160);
+        parameters.setPictureSize(1920, 1080);
         parameters.setPreviewSize(bestPictureSize.width, bestPictureSize.height);
         Log.i("Init Camera", parameters.getPreviewSize().width + "," + parameters.getPreviewSize().height);
 
@@ -266,8 +268,16 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void saveRefImage(String imageName) {
-        MyUtility.saveImageToGallery(getContext().getApplicationContext(), takeRefImage, "rephoto", imageName + "-ref.png");
+        MyUtility.saveImageToGallery(getContext().getApplicationContext(), takeRefImage, "Rephoto", imageName + "-ref.png");
     }
 
-    public native void alphaBlend(long src1, long src2, long result);
+    public Bitmap getRefImage() {
+        return takeRefImage;
+    }
+
+    public Bitmap getResultImage() {
+        return takeResultImage;
+    }
+
+    public native void calAlphaBlend(long src1, long src2, long result);
 }

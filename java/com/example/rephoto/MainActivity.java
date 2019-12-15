@@ -22,13 +22,17 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Size;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import static com.example.rephoto.State.FINISH;
@@ -67,6 +71,9 @@ public class MainActivity extends AppCompatActivity {
 
     /** */
     private Bitmap tempBitmap;
+
+    /** */
+    private String imageFileName;
 
     GetPathFromUri4kitkat getPathFromUri4kitkat = new GetPathFromUri4kitkat();
 
@@ -188,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         MyUtility.state = HAVE_REF;
                         gotoHAVE_REF();
-                        //cameraView.saveRefImage(nowName);
+                        cameraView.saveRefImage(nowName);
                     }
                 });
                 builder.show();
@@ -197,6 +204,15 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case REPHOTO_DONE:
+                String saveFileName, saveTxt;
+                long now = System.currentTimeMillis();
+                SimpleDateFormat formatter = new SimpleDateFormat("MMddHHmmss");
+                Date curDate = new Date(now);
+                String strDate = formatter.format(curDate);
+
+                saveFileName = imageFileName + "-" + strDate + "-result.png";
+                Toast.makeText(MainActivity.this, "saved as " + saveFileName, Toast.LENGTH_SHORT).show();
+                MyUtility.saveImageToGallery(getApplicationContext(), cameraView.getResultImage(), "Rephoto", saveFileName);
                 break;
             case SWITCH:
                 break;
@@ -215,6 +231,9 @@ public class MainActivity extends AppCompatActivity {
                 MyUtility.state = NO_REF;
                 gotoNO_REF();
                 break;
+            case REPHOTO:
+                MyUtility.state = HAVE_REF;
+                gotoHAVE_REF();
             case REPHOTO_DONE:
                 MyUtility.state = HAVE_REF;
                 gotoHAVE_REF();
@@ -232,7 +251,10 @@ public class MainActivity extends AppCompatActivity {
             Uri selectedImage = data.getData();
             if (selectedImage != null) {
                 String imagePath = getPathFromUri4kitkat.getPath(MainActivity.this, selectedImage);
-                String imageName = imagePath.substring(imagePath.lastIndexOf("/") + 1, imagePath.lastIndexOf("-"));
+                int name_st = imagePath.lastIndexOf("/") + 1;
+                int name_ed = imagePath.lastIndexOf("-");
+                if (name_ed == -1) name_ed = imagePath.length();
+                imageFileName = imagePath.substring(name_st, name_ed);
                 try {
                     Bitmap bitmap = BitmapFactory.decodeStream(this.getContentResolver().openInputStream(selectedImage));
                     bitmap = MyUtility.scaleBitmap(bitmap, (float) (1920.0f / bitmap.getWidth()), (float) (1080.0f / bitmap.getHeight()));
