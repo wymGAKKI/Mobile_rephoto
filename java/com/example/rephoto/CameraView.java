@@ -52,7 +52,6 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     private Camera.PreviewCallback mCameraPreviewCallback = new Camera.PreviewCallback() {
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
-            Log.i("test draw", "test draw");
 
             switch (MyUtility.state) {
                 case NO_REF:
@@ -151,6 +150,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     public CameraView(Context context, DrawView drawView) {
         super(context);
         initCamera();
+        sobelFilter("/storage/emulated/0/Rephoto/-ref.png");
         mHolder = this.getHolder();
         mHolder.addCallback(this);
         mDraw = drawView;
@@ -280,4 +280,5 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public native void calAlphaBlend(long src1, long src2, long result);
+    public native String sobelFilter(String imagePath);
 }

@@ -2,16 +2,20 @@ package com.example.rephoto;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Surface;
@@ -49,7 +53,15 @@ public class MainActivity extends AppCompatActivity {
         if (!OpenCVLoader.initDebug()) {
             Log.i("Opencv Init", "error");
         }
-        System.loadLibrary("opencv_java3");
+        /*
+        System.loadLibrary("dl_android");
+        System.loadLibrary("vndksupport");
+        System.loadLibrary("cgrouprc");
+        System.loadLibrary("processgroup");
+        System.loadLibrary("base");
+        System.loadLibrary("cutils");
+        */
+        System.loadLibrary("foo");
         System.loadLibrary("native-lib");
     }
 
@@ -76,7 +88,42 @@ public class MainActivity extends AppCompatActivity {
     private String imageFileName;
 
     GetPathFromUri4kitkat getPathFromUri4kitkat = new GetPathFromUri4kitkat();
+    // Storage Permissions
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
 
+    /**
+     * Checks if the app has permission to write to device storage
+     *
+     * If the app does not has permission then the user will be prompted to grant permissions
+     *
+     * @param activity
+     */
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+            Log.i("permission", "test");
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permission,
+                                           int[] grantResults) {
+        //requestCode就是requestPermissions()的第三个参数
+        //permission就是requestPermissions()的第二个参数
+        //grantResults是结果，0调试通过，-1表示拒绝
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +131,8 @@ public class MainActivity extends AppCompatActivity {
         // Example of a call to a native method
         //TextView tv = findViewById(R.id.sample_text);
         //tv.setText(stringFromJNI());
+        stringFromJNI();
+        verifyStoragePermissions(this);
 
         /** Force landscape*/
         //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
