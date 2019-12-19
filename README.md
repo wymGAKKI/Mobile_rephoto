@@ -17,6 +17,8 @@
  
   - Download OpenCL-Z in phone, get version of OpenCL and position of library
   - Use adb pull the library in project```adb pull $LIBRARY_PATH```
-        - Huawei libGLES_mali.so and dependence libraries
-        - Others libOpenCL.so and dependence libraries
+  
+    - Huawei libGLES_mali.so and dependence libraries
+    - Others libOpenCL.so and dependence libraries
+        
   - Modify CMakeLists.txt

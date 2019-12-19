@@ -1,2 +1,4 @@
-cpp/include
+cpp/include/opencv
+cpp/include/opencv2
+cpp/include/CL
 jniLibs

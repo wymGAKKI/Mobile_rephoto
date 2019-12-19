@@ -5,6 +5,8 @@
 #include <CL/cl.h>
 #include <dlfcn.h>
 #include <android/log.h>
+#include "GPUBase.h"
+#include "SiftGPU.h"
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO , "REPHOTO", __VA_ARGS__)
 

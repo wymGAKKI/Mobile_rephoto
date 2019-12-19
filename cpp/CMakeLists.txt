@@ -27,6 +27,19 @@ set_target_properties(libfoo PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/..
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/include/CL)
 
+add_library(
+        sift-lib
+        SHARED
+
+        GPUBase.cpp
+        PyramidProcess.cpp
+        GaussFilter.cpp
+        DetectExtrema.cpp
+        Subtract.cpp
+        imgfeatures.cpp
+        utils.cpp
+        SiftGPU.cpp
+)
 
 add_library( # Sets the name of the library.
         native-lib
@@ -52,6 +65,14 @@ find_library( # Sets the name of the path variable.
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
+
+target_link_libraries(
+        sift-lib
+
+        libopencv_java3
+        libgles
+        libfoo
+)
 target_link_libraries( # Specifies the target library.
         native-lib
 
