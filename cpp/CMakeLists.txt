@@ -47,6 +47,7 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
+        opencl_test.cpp
         native-lib.cpp)
 
 # Searches for a specified prebuilt library and stores the path as a
@@ -76,6 +77,7 @@ target_link_libraries(
 target_link_libraries( # Specifies the target library.
         native-lib
 
+        sift-lib
         libopencv_java3
         libgles
         libfoo

@@ -22,3 +22,4 @@
     - Others libOpenCL.so and dependence libraries
         
   - Modify CMakeLists.txt
+  - Add CL files to Phone

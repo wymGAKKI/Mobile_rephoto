@@ -5,7 +5,7 @@
 
 
 
-Subtract::Subtract(): PyramidProcess("C:\\Users\\Mati\\Desktop\\Dropbox\\MGR\\SIFTOpenCL\\GPU\\OpenCL\\Subtract.cl","ckSub")
+Subtract::Subtract(): PyramidProcess("/storage/emulated/0/Rephoto/GPU_CL/Subtract.cl","ckSub")
 {
 
 }

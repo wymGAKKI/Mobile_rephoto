@@ -9,7 +9,7 @@ GaussFilter::~GaussFilter(void)
 {
 }
 
-GaussFilter::GaussFilter(): PyramidProcess("C:\\Users\\Mati\\Desktop\\Dropbox\\MGR\\SIFTOpenCL\\GPU\\OpenCL\\BlurGaussFilter.cl","ckConv")
+GaussFilter::GaussFilter(): PyramidProcess("/storage/emulated/0/Rephoto/GPU_CL/BlurGaussFilter.cl","ckConv")
 {
 
 }

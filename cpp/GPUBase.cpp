@@ -23,7 +23,7 @@ GPUBase::GPUBase(char* source, char* KernelName)
     GPUCommandQueue = GPU::getInstance().GPUCommandQueue;
 
     // Load OpenCL kernel
-    SourceOpenCLShared = LoadProgramSource("C:\\Users\\Mati\\Desktop\\Dropbox\\MGR\\SIFTOpenCL\\GPU\\OpenCL\\GPUCode.cl", "// My comment\n", &szKernelLength);
+    SourceOpenCLShared = LoadProgramSource("/storage/emulated/0/Rephoto/GPU_CL/GPUCode.cl", "// My comment\n", &szKernelLength);
 
     SourceOpenCL = LoadProgramSource(source, "// My comment\n", &szKernelLengthFilter);
 

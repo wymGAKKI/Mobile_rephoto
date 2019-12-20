@@ -12,7 +12,7 @@
 
 #define DESC_EXTREMA_OPENCL_KERNEL		"ckDesc"
 
-#define DETECT_EXTREMA_OPENCL_SOURCE	"C:\\Users\\Mati\\Desktop\\Dropbox\\MGR\\SIFTOpenCL\\GPU\\OpenCL\\DetectExtrema.cl"
+#define DETECT_EXTREMA_OPENCL_SOURCE	"/storage/emulated/0/Rephoto/GPU_CL/DetectExtrema.cl"
 
 #define SIFT_MAX_NUMBER_KEYS			4000
 
