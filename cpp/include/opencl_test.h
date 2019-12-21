@@ -6,6 +6,7 @@
 #define REPHOTO_OPENCL_TEST_H
 #include <opencv2/opencv.hpp>
 #include <CL/cl.h>
+#include <opencv2/core/types_c.h>
 
 #define N 20	//这里的N是sobel滤波的阈值
 #define  KERNEL_SRC "\n" \

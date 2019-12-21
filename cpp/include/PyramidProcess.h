@@ -5,6 +5,7 @@
 #ifndef REPHOTO_PYRAMIDPROCESS_H
 #define REPHOTO_PYRAMIDPROCESS_H
 
+#include <opencv2/core/types_c.h>
 #include "GPUBase.h"
 #include "Shared.h"
 

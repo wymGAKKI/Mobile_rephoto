@@ -3,6 +3,7 @@
 //
 
 
+#include <android/log.h>
 #include "DetectExtrema.h"
 
 

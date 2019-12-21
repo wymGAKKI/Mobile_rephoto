@@ -124,6 +124,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
                     refImage = MyUtility.scaleBitmap(takeRefImage, scaleShowImage, scaleShowImage);
                     MyUtility.state = SHOW_REF;
                     startCameraPreview();
+                    sobelFilter("/storage/emulated/0/Rephoto/-ref.png");
 
                     Log.i("take", "photo");
 
@@ -150,7 +151,6 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     public CameraView(Context context, DrawView drawView) {
         super(context);
         initCamera();
-        sobelFilter("/storage/emulated/0/Rephoto/-ref.png");
         mHolder = this.getHolder();
         mHolder.addCallback(this);
         mDraw = drawView;

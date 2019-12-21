@@ -47,6 +47,7 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
+        sift_cpu.cpp
         opencl_test.cpp
         native-lib.cpp)
 
@@ -80,7 +81,6 @@ target_link_libraries( # Specifies the target library.
 
         sift-lib
         libopencv_java3
-        libopencv_highgui
         libgles
         libfoo
         # Links the target library to the log library

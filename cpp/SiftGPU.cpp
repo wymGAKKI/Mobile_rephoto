@@ -6,6 +6,8 @@
 #include "SiftGPU.h"
 #include <opencv2/opencv.hpp>
 #include <android/log.h>
+#include <opencv2/core/core_c.h>
+#include <opencv2/imgproc/imgproc_c.h>
 
 
 SiftGPU::SiftGPU(int _intvls, float _sigma, float _contr_thr, int _curv_thr, int _descr_width, int _descr_hist_bins, int _img_dbl)
@@ -70,6 +72,7 @@ int SiftGPU::DoSift( IplImage* img )
     imageHeight = new int[octvs];
 
     BuildGaussPyramid(init_img);
+
     storage = cvCreateMemStorage( 0 );
 
     double duration = 0;
@@ -79,10 +82,19 @@ int SiftGPU::DoSift( IplImage* img )
     total = features->total;
     feat = (feature*)calloc(total, sizeof(feature));
     feat = (feature*)cvCvtSeqToArray( features, feat, CV_WHOLE_SEQ );
+
+    kpts.resize(total);
+    descriptor.create(total, 128, CV_32F);
+
     for(int i = 0; i < total; i++ )
     {
         free( feat[i].feature_data );
         feat[i].feature_data = NULL;
+        kpts[i] = cv::KeyPoint(feat[i].x, feat[i].y, feat[i].ori, feat[i].scl);
+        for (int j = 0; j < 128; j++) {
+            descriptor.at<float>(i, j) = feat[i].descr[j];
+        }
+
     }
 
     cvReleaseMemStorage( &storage );
@@ -255,8 +267,6 @@ CvSeq* SiftGPU::DetectAndGenerateDesc()
     int OffsetNext = 0;
     int OffsetPrev = 0;
 
-    kpts.resize(total);
-    descriptor.create(total, 128, CV_32F);
 
 
     Keys keysArray[SIFT_MAX_NUMBER_KEYS];
@@ -304,15 +314,10 @@ CvSeq* SiftGPU::DetectAndGenerateDesc()
                     feat->ori = (double)keysArray[ik].ori;
                     feat->d = 128;
 
-                    kpts[count] = cv::KeyPoint(keysArray[ik].scx, keysArray[ik].scy, keysArray[ik].ori, keysArray[ik].scl);
-
-                    if (o == 1 && ik == 0) {
-                        __android_log_print(ANDROID_LOG_INFO, "SiftGPU", "sclx,scly : %f %f, x, y: %f %f, scl: %f, scl_octv: %f", feat->x, feat->y, ddata->c, ddata->r, feat->scl, ddata->scl_octv);
-                    }
 
                     for(int i = 0; i < 128 ; i++ )
                     {
-                        descriptor.at<float>(count, i) = keysArray[ik].desc[i];
+                        //descriptor.at<float>(count, i) = keysArray[ik].desc[i];
                         feat->descr[i] = keysArray[ik].desc[i];
                     }
                     cvSeqPush( features, feat );
@@ -324,6 +329,7 @@ CvSeq* SiftGPU::DetectAndGenerateDesc()
             OffsetAct += sizeOfImages[o];
         }
     }
+
 
     return features;
 }

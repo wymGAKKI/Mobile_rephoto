@@ -6,6 +6,8 @@
 #include "imgfeatures.h"
 
 #include <math.h>
+#include <opencv2/core/core_c.h>
+#include <opencv2/imgproc/imgproc_c.h>
 
 static int import_oxfd_features( char*, feature** );
 static int export_oxfd_features( char*, feature*, int );

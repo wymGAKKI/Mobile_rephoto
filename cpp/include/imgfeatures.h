@@ -6,6 +6,7 @@
 #define REPHOTO_IMGFEATURES_H
 
 #include <opencv2/opencv.hpp>
+#include <opencv2/core/types_c.h>
 
 /** FEATURE_OXFD <BR> FEATURE_LOWE */
 enum feature_type

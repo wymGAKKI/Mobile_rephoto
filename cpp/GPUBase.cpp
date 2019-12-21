@@ -2,6 +2,7 @@
 // Created by admin on 2019/12/19.
 //
 
+#include <opencv2/core/types_c.h>
 #include "GPUBase.h"
 
 

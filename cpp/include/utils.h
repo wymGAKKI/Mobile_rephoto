@@ -15,6 +15,7 @@ Copyright (C) 2006-2010  Rob Hess <hess@eecs.oregonstate.edu>
 
 #include <opencv2/opencv.hpp>
 #include <stdio.h>
+#include <opencv2/core/types_c.h>
 
 /* absolute value */
 #ifndef ABS
