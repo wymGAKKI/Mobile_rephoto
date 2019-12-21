@@ -12,7 +12,7 @@ cmake_minimum_required(VERSION 3.4.1)
 
 # Set OpenCV
 add_library(libopencv_java3 SHARED IMPORTED)
-set_target_properties(libopencv_java3 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}}/../jniLibs/${ANDROID_ABI}/libopencv_java3.so)
+set_target_properties(libopencv_java3 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}}/../jniLibs/${ANDROID_ABI}/libopencv_java4.so)
 
 # Set OpenCL
 #add_library(libopencl SHARED IMPORTED)
@@ -70,6 +70,7 @@ find_library( # Sets the name of the path variable.
 target_link_libraries(
         sift-lib
 
+        ${log-lib}
         libopencv_java3
         libgles
         libfoo
@@ -79,6 +80,7 @@ target_link_libraries( # Specifies the target library.
 
         sift-lib
         libopencv_java3
+        libopencv_highgui
         libgles
         libfoo
         # Links the target library to the log library

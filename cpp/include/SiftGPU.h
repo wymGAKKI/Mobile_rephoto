@@ -133,6 +133,8 @@ private:
 public:
 
     feature* feat;
+    cv::Mat descriptor;
+    vector<cv::KeyPoint> kpts;
     SiftGPU(int _intvls, float _sigma, float _contr_thr, int _curv_thr, int _descr_width, int _descr_hist_bins, int _img_dbl);
     int DoSift(IplImage* img);
 
