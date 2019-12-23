@@ -4,16 +4,16 @@
 
 ### OpenCV in Android Studio
 
- - Android_Opencv == 3.1.0
+ - Android_Opencv == 4.0.1
  - Import Module from ```${Opencv_FILE}/sdk/java```
- - Modify openCV library gradle & AndroidManifest.xml SDK version
+ - Modify OpenCV library gradle
  - Project Structure -> Dependencies add Opencv
  - Add NDK Library ```${Opencv_FILE}/sdk/native/libs```
  - Add Include File 
  - Modify CMakeLists.txt (Sync)
  
  
- ### OpenCL 
+### OpenCL 
  
   - Download OpenCL-Z in phone, get version of OpenCL and position of library
   - Use adb pull the library in project```adb pull $LIBRARY_PATH```
