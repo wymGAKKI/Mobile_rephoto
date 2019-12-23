@@ -28,17 +28,24 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/include/CL)
 
 add_library(
-        sift-lib
+        sift-cpu-lib
         SHARED
 
-        GPUBase.cpp
-        PyramidProcess.cpp
-        GaussFilter.cpp
-        DetectExtrema.cpp
-        Subtract.cpp
-        imgfeatures.cpp
-        utils.cpp
-        SiftGPU.cpp
+        src/sift_cpu/sift_cpu.cpp
+)
+
+add_library(
+        sift-cl-lib
+        SHARED
+
+        src/sift_cl/GPUBase.cpp
+        src/sift_cl/PyramidProcess.cpp
+        src/sift_cl/GaussFilter.cpp
+        src/sift_cl/DetectExtrema.cpp
+        src/sift_cl/Subtract.cpp
+        src/sift_cl/imgfeatures.cpp
+        src/sift_cl/utils.cpp
+        src/sift_cl/SiftGPU.cpp
 )
 
 add_library( # Sets the name of the library.
@@ -47,9 +54,8 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        sift_cpu.cpp
-        opencl_test.cpp
-        native-lib.cpp)
+        src/opencl_test.cpp
+        src/native-lib.cpp)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -69,17 +75,26 @@ find_library( # Sets the name of the path variable.
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries(
-        sift-lib
+        sift-cpu-lib
+
+        ${log-lib}
+        libopencv_java3
+)
+
+target_link_libraries(
+        sift-cl-lib
 
         ${log-lib}
         libopencv_java3
         libgles
         libfoo
 )
+
 target_link_libraries( # Specifies the target library.
         native-lib
 
-        sift-lib
+        sift-cpu-lib
+        sift-cl-lib
         libopencv_java3
         libgles
         libfoo

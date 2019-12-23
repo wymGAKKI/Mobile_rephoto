@@ -4,7 +4,7 @@
 
 
 #include <android/log.h>
-#include "DetectExtrema.h"
+#include "sift_cl/DetectExtrema.h"
 
 
 

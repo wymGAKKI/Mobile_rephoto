@@ -106,7 +106,7 @@
 //    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 \**********************************************************************************************/
 
-#include "sift_cpu.h"
+#include "sift_cpu/sift_cpu.h"
 #include <iostream>
 #include <opencv2/imgproc.hpp>
 
@@ -812,6 +812,7 @@ static const int SIFT_FIXPT_SCALE = 48;
         Mat base = createInitialImage(image, firstOctave < 0, (float)sigma);
         std::vector<Mat> gpyr, dogpyr;
         int nOctaves = actualNOctaves > 0 ? actualNOctaves : cvRound(std::log( (double)std::min( base.cols, base.rows ) ) / std::log(2.) - 2) - firstOctave;
+        nOctaves = 2;
 
         //double t, tf = getTickFrequency();
         //t = (double)getTickCount();

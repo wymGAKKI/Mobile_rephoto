@@ -4,7 +4,7 @@
 
 #ifndef REPHOTO_SUBTRACT_H
 #define REPHOTO_SUBTRACT_H
-#include "PyramidProcess.h"
+#include "sift_cl/PyramidProcess.h"
 
 
 class Subtract :

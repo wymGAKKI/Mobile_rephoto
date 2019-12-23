@@ -1,16 +1,16 @@
 //
 // Created by admin on 2019/12/19.
 //
-#include "imgfeatures.h"
-#include "utils.h"
-#include "SiftGPU.h"
+#include "sift_cl/imgfeatures.h"
+#include "sift_cl/utils.h"
+#include "sift_cl/SiftGPU.h"
 #include <opencv2/opencv.hpp>
 #include <android/log.h>
 #include <opencv2/core/core_c.h>
 #include <opencv2/imgproc/imgproc_c.h>
 
 
-SiftGPU::SiftGPU(int _intvls, float _sigma, float _contr_thr, int _curv_thr, int _descr_width, int _descr_hist_bins, int _img_dbl)
+SiftGPU::SiftGPU(int height, int width, int _intvls, float _sigma, float _contr_thr, int _curv_thr, int _descr_width, int _descr_hist_bins, int _img_dbl)
 {
     intvls = _intvls;
     sigma = _sigma;
@@ -34,6 +34,46 @@ SiftGPU::SiftGPU(int _intvls, float _sigma, float _contr_thr, int _curv_thr, int
     gaussFilter = new GaussFilter();
     subtract = new Subtract();
     detectExt = new DetectExtrema(SIFT_MAX_NUMBER_KEYS);
+
+    float k;
+    int intvlsSum = intvls + 3;
+    float sig_total, sig_prev;
+    int cur_h = height * 2;
+    int cur_w = width * 2;
+
+    sig[0] = sigma;
+    k = pow( 2.0, 1.0 / intvls );
+
+
+    for(int i = 1; i < intvlsSum; i++ )
+    {
+        sig_prev = pow( k, i - 1 ) * sigma;
+        sig_total = sig_prev * k;
+        sig[i] = sqrt( sig_total * sig_total - sig_prev * sig_prev );
+    }
+
+    octvs = log( (float)MIN( cur_h,  cur_w ) ) / log((float)2) - 2;
+    sizeOfImages = new int[octvs];
+    imageWidth = new int[octvs];
+    imageHeight = new int[octvs];
+
+    sizeOfImages[0] = sizeof(float)* cur_h * cur_w;
+    SizeOfPyramid += sizeOfImages[0] * intvlsSum;
+    imageHeight[0] = cur_h;
+    imageWidth[0] = cur_w;
+
+    for(int o = 1; o < octvs; o++ )
+    {
+        cur_h /= 2;
+        cur_w /= 2;
+        sizeOfImages[o] = sizeof(float)* cur_h * cur_w;
+        SizeOfPyramid += sizeOfImages[o] * intvlsSum;
+        imageHeight[o] = cur_h;
+        imageWidth[o] = cur_w;
+    }
+
+    gaussFilter->CreateBufferForPyramid(SizeOfPyramid);
+    subtract->CreateBufferForPyramid(SizeOfPyramid);
 }
 
 /*
@@ -57,19 +97,15 @@ int FeatureCmp( void* feat1, void* feat2, void* param )
     return 0;
 }
 
-int SiftGPU::DoSift( IplImage* img )
+int SiftGPU::DoSift(cv::Mat &img)
 {
     //printf("\n ----------- DoSift START --------------- \n");
 
-    IplImage* init_img;
+    cv::Mat init_img;
     CvSeq* features;
 
 
     init_img = CreateInitialImg( img, img_dbl, sigma );
-    octvs = log( (float)MIN( init_img->width, init_img->height ) ) / log((float)2) - 2;
-    sizeOfImages = new int[octvs];
-    imageWidth = new int[octvs];
-    imageHeight = new int[octvs];
 
     BuildGaussPyramid(init_img);
 
@@ -97,8 +133,8 @@ int SiftGPU::DoSift( IplImage* img )
 
     }
 
+    free(feat);
     cvReleaseMemStorage( &storage );
-    cvReleaseImage( &init_img );
 
     return total;
 }
@@ -114,50 +150,15 @@ Builds Gaussian scale space pyramid from an image
 @param sigma amount of Gaussian smoothing per octave
 @return Returns a Gaussian scale space pyramid as an octvs x (intvls + 3) array
 */
-bool SiftGPU::BuildGaussPyramid(IplImage* base)
+bool SiftGPU::BuildGaussPyramid(cv::Mat &base)
 {
-    float k;
     int intvlsSum = intvls + 3;
-    float sig_total, sig_prev;
 
-    imgArray = (IplImage**)calloc(octvs, sizeof(IplImage*));
-
-    ///*
-    //	precompute Gaussian sigmas using the following formula:
-
-    //	\sigma_{total}^2 = \sigma_{i}^2 + \sigma_{i-1}^2
-    //*/
-
-    sig[0] = sigma;
-    k = pow( 2.0, 1.0 / intvls );
+    std::vector<cv::Mat> pyr;
+    pyr.resize(octvs);
 
 
-    for(int i = 1; i < intvlsSum; i++ )
-    {
-        sig_prev = pow( k, i - 1 ) * sigma;
-        sig_total = sig_prev * k;
-        sig[i] = sqrt( sig_total * sig_total - sig_prev * sig_prev );
-    }
-
-    imgArray[0] = cvCloneImage(base);
-
-    sizeOfImages[0] = imgArray[0]->imageSize;
-    SizeOfPyramid += imgArray[0]->imageSize * intvlsSum;
-    imageHeight[0] = imgArray[0]->height;
-    imageWidth[0] = imgArray[0]->width;
-
-    for(int o = 1; o < octvs; o++ )
-    {
-        imgArray[o] = Downsample( imgArray[o-1] );
-        SizeOfPyramid += imgArray[o]->imageSize * intvlsSum;
-        sizeOfImages[o] = imgArray[o]->imageSize;
-        imageHeight[o] = imgArray[o]->height;
-        imageWidth[o] = imgArray[o]->width;
-    }
-
-    gaussFilter->CreateBufferForPyramid(SizeOfPyramid);
-    subtract->CreateBufferForPyramid(SizeOfPyramid);
-
+    pyr[0] = base.clone();
 
     int offset = 0;
 
@@ -188,17 +189,17 @@ bool SiftGPU::BuildGaussPyramid(IplImage* base)
 
             if( o == 0  &&  i == 0 )
             {
-                gaussFilter->SendImageToPyramid(imgArray[o], OffsetAct);
+                gaussFilter->SendImageToPyramid(pyr[o], OffsetAct);
             } else if(i == 0)
             {
-                gaussFilter->ReceiveImageFromPyramid(imgArray[o-1], OffsetPrev);
-                imgArray[o] = Downsample( imgArray[o-1] );
-                gaussFilter->SendImageToPyramid(imgArray[o], OffsetAct);
+                gaussFilter->ReceiveImageFromPyramid(pyr[o-1], OffsetPrev);
+                cv::resize(pyr[o-1], pyr[o], cv::Size(pyr[o-1].cols/2, pyr[o-1].rows/2), 0, 0, cv::INTER_NEAREST);
+                gaussFilter->SendImageToPyramid(pyr[o], OffsetAct);
             }
 
             if(i > 0 )
             {
-                gaussFilter->Process( sig[i], imgArray[o]->width, imgArray[o]->height, OffsetPrev, OffsetAct);
+                gaussFilter->Process( sig[i], imageWidth[o], imageHeight[o], OffsetPrev, OffsetAct);
                 subtract->Process(gaussFilter->cmBufPyramid, imageWidth[o], imageHeight[o], OffsetPrev, OffsetAct);
             }
             OffsetPrev = OffsetAct;
@@ -206,21 +207,24 @@ bool SiftGPU::BuildGaussPyramid(IplImage* base)
         }
     }
 
-    //OffsetPrev = 0;
-    //for( o = 0; o < octvs; o++ )
-    //{
-    //	for( i = 0; i < intvlsSum; i++ )
-    //	{
-    //		subtract->ReceiveImageToBufPyramid(imgArray[o], OffsetPrev);
-    //		cvNamedWindow( "sub", 1 );
-    //		cvShowImage( "sub", imgArray[o] );
-    //		cvWaitKey( 0 );
-    //		OffsetPrev += sizeOfImages[o];
-    //	}
-    //}
+    /*
+    OffsetPrev = 0;
+    for(int o = 0; o < octvs; o++ )
+    {
+    	for(int i = 0; i < intvlsSum; i++ )
+    	{
+    	    __android_log_print(ANDROID_LOG_INFO, "build pyr", "size %d channel %d", pyr[o].rows * pyr[o].cols, pyr[o].channels());
+    		subtract->ReceiveImageFromPyramid(pyr[o], OffsetPrev);
+    		std::string num = std::to_string(o * intvlsSum + i);
+    		pyr[o]*=255;
+    		//cv::Mat now = cv::cvarrToMat(imgArray[o])*255;
+    	    cv::imwrite("/storage/emulated/0/" + num + ".png",pyr[o]);
+    		OffsetPrev += sizeOfImages[o];
+    	}
+    }
+     */
 
 
-    free( sig );
     return true;
 }
 
@@ -362,34 +366,33 @@ optionally doubled in size prior to smoothing.
 @param img_dbl if true, image is doubled in size prior to smoothing
 @param sigma total std of Gaussian smoothing
 */
-IplImage* SiftGPU::CreateInitialImg( IplImage* img, int img_dbl, float sigma )
+cv::Mat SiftGPU::CreateInitialImg( const cv::Mat& img, int img_dbl, float sigma )
 {
-    IplImage* gray, * dbl;
+    cv::Mat gray, gray_fpt;
+    if( img.channels() == 3 || img.channels() == 4 )
+        cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY);
+    else
+        img.copyTo(gray);
+    gray.convertTo(gray_fpt, cv::DataType<float>::type, 1, 0);
+    gray_fpt/=255;
+
     float sig_diff;
 
-    gray = ConvertToGray32( img );
     if( img_dbl )
     {
-        sig_diff = sqrt( sigma * sigma - SIFT_INIT_SIGMA * SIFT_INIT_SIGMA * 4 );
-        dbl = cvCreateImage( cvSize( img->width*2, img->height*2 ), 32, 1 );
-
-        cvResize( gray, dbl, CV_INTER_CUBIC );
-
-        cvSmooth( dbl, dbl, CV_GAUSSIAN, 0, 0, sig_diff, sig_diff );
-
-        cvReleaseImage( &gray );
+        sig_diff = sqrtf( std::max(sigma * sigma - 0.5 * 0.5 * 4, 0.01) );
+        cv::Mat dbl;
+        cv::resize(gray_fpt, dbl, cv::Size(gray.cols*2, gray.rows*2), 0, 0, cv::INTER_LINEAR);
+        GaussianBlur(dbl, dbl, cv::Size(), sig_diff, sig_diff);
         return dbl;
     }
     else
     {
-        sig_diff = sqrt( sigma * sigma - SIFT_INIT_SIGMA * SIFT_INIT_SIGMA );
-
-        cvSmooth( gray, gray, CV_GAUSSIAN, 0, 0, sig_diff, sig_diff );
-
-        return gray;
+        sig_diff = sqrtf( std::max(sigma * sigma - SIFT_INIT_SIGMA * SIFT_INIT_SIGMA, 0.01) );
+        GaussianBlur(gray_fpt, gray_fpt, cv::Size(), sig_diff, sig_diff);
+        return gray_fpt;
     }
 }
-
 
 /*
 Converts an image to 32-bit grayscale

@@ -3,7 +3,7 @@
 //
 
 #include <android/log.h>
-#include "include/opencl_test.h"
+#include "opencl_test.h"
 
 int GPU_Sobel(IplImage* inputImg_gray, IplImage* outputImg) {
 

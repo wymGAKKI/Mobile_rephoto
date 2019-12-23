@@ -6,8 +6,8 @@
 #define REPHOTO_PYRAMIDPROCESS_H
 
 #include <opencv2/core/types_c.h>
-#include "GPUBase.h"
-#include "Shared.h"
+#include "sift_cl/GPUBase.h"
+#include "sift_cl/Shared.h"
 
 
 class PyramidProcess :
@@ -20,9 +20,9 @@ public:
 
     bool CreateBufferForPyramid(float size);
 
-    bool ReceiveImageFromPyramid( IplImage* img, int offset);
+    bool ReceiveImageFromPyramid( cv::Mat &img, int offset);
 
-    bool SendImageToPyramid(IplImage* img, int offset);
+    bool SendImageToPyramid(cv::Mat &img, int offset);
 
     /*!
     * Destructor.

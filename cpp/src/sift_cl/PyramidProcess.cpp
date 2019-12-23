@@ -1,7 +1,7 @@
 //
 // Created by admin on 2019/12/19.
 //
-#include "PyramidProcess.h"
+#include "sift_cl/PyramidProcess.h"
 
 
 
@@ -24,12 +24,12 @@ bool PyramidProcess::CreateBufferForPyramid( float size )
 }
 
 
-bool PyramidProcess::ReceiveImageFromPyramid( IplImage* img, int offset)
+bool PyramidProcess::ReceiveImageFromPyramid( cv::Mat &img, int offset)
 {
     clock_t start, finish;
     double duration = 0;
     start = clock();
-    GPUError = clEnqueueReadBuffer(GPUCommandQueue, cmBufPyramid, CL_TRUE, offset, img->imageSize, (void*)img->imageData, 0, NULL, NULL);
+    GPUError = clEnqueueReadBuffer(GPUCommandQueue, cmBufPyramid, CL_TRUE, offset, img.step[0] * img.rows, (void*)img.data, 0, NULL, NULL);
     CheckError(GPUError);
     finish = clock();
     duration = (double)(finish - start) / CLOCKS_PER_SEC;
@@ -37,12 +37,12 @@ bool PyramidProcess::ReceiveImageFromPyramid( IplImage* img, int offset)
     return true;
 }
 
-bool PyramidProcess::SendImageToPyramid( IplImage* img, int offset)
+bool PyramidProcess::SendImageToPyramid( cv::Mat &img, int offset)
 {
     clock_t start, finish;
     double duration = 0;
     start = clock();
-    GPUError = clEnqueueWriteBuffer(GPUCommandQueue, cmBufPyramid, CL_TRUE, offset, img->imageSize, (void*)img->imageData, 0, NULL, NULL);
+    GPUError = clEnqueueWriteBuffer(GPUCommandQueue, cmBufPyramid, CL_TRUE, offset, img.step[0] * img.rows, (void*)img.data, 0, NULL, NULL);
     CheckError(GPUError);
     finish = clock();
     duration = (double)(finish - start) / CLOCKS_PER_SEC;

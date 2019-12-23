@@ -2,8 +2,8 @@
 // Created by admin on 2019/12/19.
 //
 
-#include "utils.h"
-#include "imgfeatures.h"
+#include "sift_cl/utils.h"
+#include "sift_cl/imgfeatures.h"
 
 #include <math.h>
 #include <opencv2/core/core_c.h>

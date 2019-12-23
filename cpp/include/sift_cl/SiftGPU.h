@@ -5,11 +5,11 @@
 #ifndef REPHOTO_SIFTGPU_H
 #define REPHOTO_SIFTGPU_H
 
-#include "GaussFilter.h"
-#include "Subtract.h"
-#include "DetectExtrema.h"
-#include "imgfeatures.h"
-#include "Shared.h"
+#include "sift_cl/GaussFilter.h"
+#include "sift_cl/Subtract.h"
+#include "sift_cl/DetectExtrema.h"
+#include "sift_cl/imgfeatures.h"
+#include "sift_cl/Shared.h"
 
 using namespace std;
 
@@ -121,10 +121,10 @@ private:
     int total;
     IplImage** imgArray;
 
-    IplImage* CreateInitialImg( IplImage* img, int img_dbl, float sigma );
+    cv::Mat CreateInitialImg(const cv::Mat &img, int img_dbl, float sigma );
     IplImage* ConvertToGray32( IplImage* img );
 
-    bool BuildGaussPyramid(IplImage* base);
+    bool BuildGaussPyramid(cv::Mat &img);
     IplImage* Downsample( IplImage* img );
     CvSeq* DetectAndGenerateDesc();
     feature* NewFeature( void );
@@ -135,8 +135,8 @@ public:
     feature* feat;
     cv::Mat descriptor;
     vector<cv::KeyPoint> kpts;
-    SiftGPU(int _intvls, float _sigma, float _contr_thr, int _curv_thr, int _descr_width, int _descr_hist_bins, int _img_dbl);
-    int DoSift(IplImage* img);
+    SiftGPU(int height, int width, int _intvls, float _sigma, float _contr_thr, int _curv_thr, int _descr_width, int _descr_hist_bins, int _img_dbl);
+    int DoSift(cv::Mat &img);
 
 };
 

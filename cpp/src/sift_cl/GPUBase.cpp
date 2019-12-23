@@ -3,7 +3,7 @@
 //
 
 #include <opencv2/core/types_c.h>
-#include "GPUBase.h"
+#include "sift_cl/GPUBase.h"
 
 
 GPUBase::GPUBase(char* source, char* KernelName)

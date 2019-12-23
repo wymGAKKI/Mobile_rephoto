@@ -5,8 +5,8 @@
 #ifndef REPHOTO_DETECTEXTREMA_H
 #define REPHOTO_DETECTEXTREMA_H
 
-#include "Shared.h"
-#include "GPUBase.h"
+#include "sift_cl/Shared.h"
+#include "sift_cl/GPUBase.h"
 
 
 class DetectExtrema :

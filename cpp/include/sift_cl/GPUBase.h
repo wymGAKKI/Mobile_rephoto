@@ -6,7 +6,7 @@
 #define REPHOTO_GPUBASE_H
 
 
-#include "Shared.h"
+#include "sift_cl/Shared.h"
 #include <CL/cl.h>
 #include <iostream>
 #include <vector>
